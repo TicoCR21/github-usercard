@@ -28,33 +28,77 @@
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
-
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
     Using DOM methods and properties, create and return the following markup:
 
     <div class="card">
+      
       <img src={image url of user} />
+      
       <div class="card-info">
         <h3 class="name">{users name}</h3>
         <p class="username">{users user name}</p>
         <p>Location: {users location}</p>
+        
         <p>Profile:
           <a href={address to users github page}>{address to users github page}</a>
         </p>
+        
         <p>Followers: {users followers count}</p>
         <p>Following: {users following count}</p>
         <p>Bio: {users bio}</p>
+      
       </div>
+    
     </div>
 */
 
-/*
-  List of LS Instructors Github username's:
-    tetondan
-    dustinmyers
-    justsml
-    luishrd
-    bigknell
-*/
+
+
+[ "ticocr21", "tetondan", "dustinmyers", "justsml", "luishrd", "bigknell" ].forEach( function( github_username )
+{
+  axios.get( `https://api.github.com/users/${ github_username }` )
+  .then( response => document.querySelector( ".cards" ).appendChild( create_github_card( response.data ) ) )
+  .catch( error => console.log( "Something Went Wrong!!!" ) )
+} );
+
+function create_github_card( github_user )
+{
+  const card = document.createElement( "div" );
+  card.className = "card";
+
+  const img = document.createElement( "img" );
+  img.src = github_user.avatar_url;
+
+  const card_info = document.createElement( "div" );
+  card_info.className = "card-info";
+
+  const name = document.createElement( "h3" );
+  name.className = "name";
+  name.textContent = github_user.name;
+
+  const username = document.createElement( "p" );
+  username.className = "username";
+  username.textContent = github_user.login;
+
+  const location = document.createElement( "p" );
+  location.textContent = `Location: ${ github_user.location ? github_user.location : "N/A" }`;
+
+  const profile = document.createElement( "p" );
+  profile.innerHTML = `Profile: <a href=${ github_user.html_url } >${ github_user.html_url }</a>`;
+
+  const followers = document.createElement( "p" );
+  followers.textContent = `Followers: ${ github_user.followers }`;
+
+  const following = document.createElement( "p" );
+  following.textContent = `Following: ${ github_user.following }`;
+
+  const bio = document.createElement( "p" );
+  bio.textContent = `Bio: ${ github_user.bio ? github_user.bio : "N/A" }`;
+
+  [ name, username, location, profile, followers, following, bio ].forEach( card_info_element => card_info.appendChild( card_info_element ) );
+  [ img, card_info ].forEach( card_element => card.appendChild( card_element ) );
+
+  return card;
+}
